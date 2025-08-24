@@ -1,0 +1,26 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# OS
+.DS_Store
+
+# Env / secrets
+.env
+.env.*
+
+# DuckDB & data
+data/*.parquet
+data/*.duckdb
+data/tmp/
+
+# Reports
+reports/*.pdf
+
+# Node / Next.js (optional UI)
+node_modules/
+.next/
+dist/

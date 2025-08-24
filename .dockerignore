@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# Git/OS
+.git/
+.DS_Store
+
+# Node/Next (future UI)
+node_modules/
+.next/
+dist/
+
+# Data/Reports
+*.parquet
+*.duckdb
+data/
+reports/
+
+# Local caches
+*.log
+.cache/
+coverage/
+

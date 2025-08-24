@@ -1,9 +1,11 @@
-
 from __future__ import annotations
+
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
+
 import pandas as pd
-from abc import ABC, abstractmethod
+
 
 @dataclass
 class IntradayQuery:
@@ -11,6 +13,7 @@ class IntradayQuery:
     interval: str  # e.g., "1min", "5min"
     start: Optional[str] = None
     end: Optional[str] = None
+
 
 class ProviderBase(ABC):
     name: str

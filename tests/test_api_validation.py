@@ -1,4 +1,5 @@
 import datetime as dt
+
 from fastapi.testclient import TestClient
 
 from apps.uyo_ai_api.app import app
@@ -44,4 +45,3 @@ def test_non_positive_price() -> None:
     body["fills"][0]["price"] = -1
     resp = client.post("/exec/kpis", params={"symbol": "AAPL"}, json=body)
     assert resp.status_code == 422
-

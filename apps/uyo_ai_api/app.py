@@ -1,21 +1,32 @@
-
-import os
-from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
-from typing import List, Optional, Literal
 import datetime as dt
+import os
+from typing import List, Literal, Optional
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+from pydantic import BaseModel, Field
 
 app = FastAPI(title="UYO AI API", version="0.1.0")
 
-# CORS: allow local Streamlit UI origins only
+# CORS: allow local Streamlit UI origins by default, extend via env
+origins = [
+    "http://localhost:8501",
+    "http://127.0.0.1:8501",
+]
+extra_origins = os.getenv("ALLOWED_CORS_ORIGINS", "")
+if extra_origins:
+    for item in extra_origins.split(","):
+        origin = item.strip().rstrip("/")
+        if origin:
+            origins.append(origin)
+# de-duplicate while preserving order
+_seen = set()
+origins = [o for o in origins if not (o in _seen or _seen.add(o))]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:8501",
-        "http://127.0.0.1:8501",
-    ],
+    allow_origins=origins,
     allow_credentials=False,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],

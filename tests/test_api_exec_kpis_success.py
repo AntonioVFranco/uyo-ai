@@ -1,4 +1,5 @@
 import datetime as dt
+
 from fastapi.testclient import TestClient
 
 from apps.uyo_ai_api.app import app
@@ -28,4 +29,3 @@ def test_exec_kpis_success() -> None:
     data = resp.json()
     for key in ("is_bps", "vwap_shortfall_bps", "twap_shortfall_bps"):
         assert key in data
-

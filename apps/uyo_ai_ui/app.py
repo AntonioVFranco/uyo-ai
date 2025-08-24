@@ -1,7 +1,6 @@
-
+import datetime as dt
 import os
 import typing as t
-import datetime as dt
 
 import requests
 import streamlit as st
@@ -74,6 +73,7 @@ def fetch_kpis(symbol: str) -> t.Dict[str, float]:
             raise ValueError(f"Missing key in response: {key}")
     return data  # type: ignore[return-value]
 
+
 tab1, tab2, tab3 = st.tabs(["Yesterday", "Slippage Explorer", "Slicing Lab"])
 
 with tab1:
@@ -98,4 +98,6 @@ with tab3:
     st.write("Plan TWAP/VWAP/POV child orders with constraints (max bar participation, pauses).")
 
 st.divider()
-st.info("Fill API keys in `.env` (optional). Respect data provider terms. This project is for educational use only.")
+st.info(
+    "Fill API keys in `.env` (optional). Respect data provider terms. This project is for educational use only."
+)

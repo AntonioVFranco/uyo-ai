@@ -2,7 +2,7 @@ import datetime as dt
 import os
 from typing import List, Literal, Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
@@ -110,3 +110,27 @@ def exec_kpis(symbol: str, window: Window, fills: List[Fill]):
     # Minimal stub for now; engines/execution will replace this logic
     # Return deterministic dummy values so the UI can integrate immediately.
     return ExecKpiResponse(is_bps=12.3, vwap_shortfall_bps=9.1, twap_shortfall_bps=11.0)
+
+
+# ---- Market data: daily OHLCV ----
+from services.ohlcv import ensure_daily
+
+
+class Bar(BaseModel):
+    ts: dt.date
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: float
+
+
+@app.get("/market/ohlcv/daily", response_model=list[Bar])
+def ohlcv_daily(
+    symbol: str = Query(...),
+    start: dt.date = Query(...),
+    end: dt.date = Query(...),
+):
+    """Return daily OHLCV for [start, end]. Backfills missing data into DuckDB on demand."""
+    df = ensure_daily(symbol, start, end)
+    return [Bar(**rec) for rec in df.to_dict("records")]

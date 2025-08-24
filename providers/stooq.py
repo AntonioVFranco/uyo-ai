@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime as dt
 import io
 
 import pandas as pd
@@ -40,3 +41,32 @@ class StooqProvider(ProviderBase):
         if end:
             df = df[df["date"] <= pd.to_datetime(end).date()]
         return df[["date", "open", "high", "low", "close", "volume"]]
+
+
+def fetch_daily_stooq(symbol: str, start: dt.date, end: dt.date) -> pd.DataFrame:
+    """Fetch daily OHLCV from Stooq CSV endpoint.
+
+    Returns an empty DataFrame on failure.
+    """
+    try:
+        url = f"https://stooq.com/q/d/l/?s={symbol.lower()}&i=d"
+        r = requests.get(url, timeout=30)
+        r.raise_for_status()
+        df = pd.read_csv(io.StringIO(r.text))
+        if df.empty:
+            return pd.DataFrame(columns=["ts", "open", "high", "low", "close", "volume"])
+        df["Date"] = pd.to_datetime(df["Date"]).dt.date
+        df = df.rename(
+            columns={
+                "Date": "ts",
+                "Open": "open",
+                "High": "high",
+                "Low": "low",
+                "Close": "close",
+                "Volume": "volume",
+            }
+        )
+        df = df[(df["ts"] >= start) & (df["ts"] <= end)]
+        return df[["ts", "open", "high", "low", "close", "volume"]]
+    except Exception:
+        return pd.DataFrame(columns=["ts", "open", "high", "low", "close", "volume"])

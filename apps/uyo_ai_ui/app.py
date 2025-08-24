@@ -2,6 +2,7 @@ import datetime as dt
 import os
 import typing as t
 
+import pandas as pd
 import requests
 import streamlit as st
 from dotenv import load_dotenv
@@ -86,6 +87,36 @@ with tab1:
                 st.metric("Implementation Shortfall (bps)", f"{kpis['is_bps']:.1f}")
                 st.metric("VWAP Shortfall (bps)", f"{kpis['vwap_shortfall_bps']:.1f}")
                 st.metric("TWAP Shortfall (bps)", f"{kpis['twap_shortfall_bps']:.1f}")
+            except Exception as e:
+                st.warning(str(e))
+
+    st.subheader("Price — last N days")
+    n_days = st.number_input("Days", min_value=5, max_value=365, value=30, step=5)
+    if st.button("Show Price"):
+        with st.spinner("Loading OHLCV..."):
+            try:
+                base = get_api_base()
+                end = dt.date.today()
+                start = end - dt.timedelta(days=int(n_days))
+                url = f"{base}/market/ohlcv/daily"
+                resp = requests.get(
+                    url,
+                    params={
+                        "symbol": symbol or "AAPL",
+                        "start": start.isoformat(),
+                        "end": end.isoformat(),
+                    },
+                    timeout=20,
+                )
+                resp.raise_for_status()
+                rows = resp.json()
+                if not rows:
+                    st.warning("No data returned.")
+                else:
+                    df = pd.DataFrame(rows)
+                    df["ts"] = pd.to_datetime(df["ts"])  # type: ignore[assignment]
+                    df = df.sort_values("ts")
+                    st.line_chart(df.set_index("ts")["close"])  # type: ignore[index]
             except Exception as e:
                 st.warning(str(e))
 

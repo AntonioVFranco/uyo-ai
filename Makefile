@@ -12,7 +12,7 @@
 	black --check .
 
     test:
-	pytest -q
+	PYTHONPATH=. pytest -q
 
     ci: lint test
 

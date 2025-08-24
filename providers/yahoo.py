@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime as dt
+
 import pandas as pd
 import yfinance as yf
 
@@ -38,3 +40,31 @@ class YahooProvider(ProviderBase):
         df = df.rename(columns=str.lower).reset_index().rename(columns={"date": "date"})
         df["date"] = pd.to_datetime(df["date"]).dt.date
         return df[["date", "open", "high", "low", "close", "volume"]]
+
+
+def fetch_daily_yahoo(symbol: str, start: dt.date, end: dt.date) -> pd.DataFrame:
+    """Fetch daily OHLCV from Yahoo Finance via yfinance.
+
+    Returns a DataFrame with columns: ts, open, high, low, close, volume.
+    """
+    df = yf.download(
+        symbol,
+        start=start,
+        end=end + dt.timedelta(days=1),
+        interval="1d",
+        auto_adjust=False,
+        progress=False,
+    )
+    if df.empty:
+        return pd.DataFrame(columns=["ts", "open", "high", "low", "close", "volume"])
+    df = df.rename(
+        columns={
+            "Open": "open",
+            "High": "high",
+            "Low": "low",
+            "Close": "close",
+            "Volume": "volume",
+        }
+    )
+    df = df.reset_index().rename(columns={"Date": "ts"})
+    return df[["ts", "open", "high", "low", "close", "volume"]]

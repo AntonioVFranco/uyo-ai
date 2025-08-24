@@ -1,7 +1,7 @@
-
 from __future__ import annotations
-import numpy as np
+
 import pandas as pd
+
 
 def vwap(df: pd.DataFrame) -> float:
     """
@@ -11,6 +11,7 @@ def vwap(df: pd.DataFrame) -> float:
     num = (df["close"] * df["volume"]).sum()
     den = df["volume"].sum()
     return float(num / den) if den else float("nan")
+
 
 def twap(df: pd.DataFrame) -> float:
     """Simple TWAP over the "close" column."""
